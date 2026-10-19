@@ -1,0 +1,72 @@
+index.html
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bet Tracker</title>
+<style>
+body{font-family:Arial;background:#111;color:#fff;padding:20px}
+.card{background:#1e1e1e;padding:18px;border-radius:16px;max-width:420px;margin:auto}
+input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:10px;border:none}
+button{background:#fff;color:#000;font-weight:bold}
+.stats{display:flex;justify-content:space-between;margin:12px 0}
+.stat{background:#2a2a2a;padding:10px;border-radius:10px;width:31%;text-align:center}
+.loss{color:#ff5a5a} .profit{color:#25D366}
+.item{background:#2a2a2a;padding:10px;border-radius:10px;margin:6px 0;font-size:14px;display:flex;justify-content:space-between}
+small{color:gray}
+</style>
+</head>
+<body>
+<div class="card">
+<h2 style="text-align:center">My Bet Tracker</h2>
+<small style="display:block;text-align:center;margin-bottom:10px">Track to stay in control. Aviator is random - no prediction works.</small>
+
+<div class="stats">
+<div class="stat"><small>Profit</small><div id="profit">P0</div></div>
+<div class="stat"><small>Bets</small><div id="count">0</div></div>
+<div class="stat"><small>Win %</small><div id="winrate">0%</div></div>
+</div>
+
+<input id="stake" type="number" placeholder="Stake e.g 50">
+<input id="ret" type="number" placeholder="Return e.g 0 if lost, 120 if won">
+<select id="result">
+<option value="lost">Lost</option>
+<option value="won">Won</option>
+</select>
+<button onclick="addBet()">+ Add Bet</button>
+<button onclick="clearAll()" style="background:#333;color:#fff">Clear All</button>
+
+<div id="list" style="margin-top:15px"></div>
+</div>
+
+<script>
+let bets = JSON.parse(localStorage.getItem('bets')||'[]');
+function render(){
+ let totalProfit=0,wins=0;
+ let html='';
+ bets.slice().reverse().forEach(b=>{
+   totalProfit+= (b.ret - b.stake);
+   if(b.result==='won') wins++;
+   html+=`<div class="item"><span>P${b.stake} → P${b.ret} <small>${b.result}</small></span><span>${new Date(b.time).toLocaleDateString()}</span></div>`;
+ });
+ document.getElementById('list').innerHTML=html;
+ document.getElementById('count').innerText=bets.length;
+ document.getElementById('profit').innerText='P'+totalProfit;
+ document.getElementById('profit').className= totalProfit>=0?'profit':'loss';
+ document.getElementById('winrate').innerText= bets.length? Math.round(wins/bets.length*100)+'%' : '0%';
+ localStorage.setItem('bets',JSON.stringify(bets));
+}
+function addBet(){
+ let stake=parseFloat(document.getElementById('stake').value);
+ let ret=parseFloat(document.getElementById('ret').value);
+ let result=document.getElementById('result').value;
+ if(!stake && stake!==0) return alert('Enter stake');
+ bets.push({stake,ret,time:Date.now(),result});
+ document.getElementById('stake').value=''; document.getElementById('ret').value='';
+ render();
+}
+function clearAll(){ if(confirm('Clear all bets?')){ bets=[]; render(); } }
+render();
+</script>
+</body>
+</html>
