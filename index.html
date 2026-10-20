@@ -1,71 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bet Tracker</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bet Tracker BW - Pro</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body{font-family:Arial;background:#111;color:#fff;padding:20px}
-.card{background:#1e1e1e;padding:18px;border-radius:16px;max-width:420px;margin:auto}
-input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:10px;border:none}
-button{background:#fff;color:#000;font-weight:bold}
-.stats{display:flex;justify-content:space-between;margin:12px 0}
-.stat{background:#2a2a2a;padding:10px;border-radius:10px;width:31%;text-align:center}
-.loss{color:#ff5a5a} .profit{color:#25D366}
-.item{background:#2a2a2a;padding:10px;border-radius:10px;margin:6px 0;font-size:14px;display:flex;justify-content:space-between}
-small{color:gray}
+:root{--bg:#0a0e13;--card:#151b23;--border:#232d39;--green:#2ecc71;--red:#ff4757;--text:#e6edf3;--muted:#8b949e}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);padding:16px;max-width:1100px;margin:auto}
+h1{margin:10px 0 4px;font-size:22px} .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}}
+.box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px}
+.box small{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:4px}
+.box b{font-size:18px} .green{color:var(--green)} .red{color:var(--red)}
+.form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin:16px 0;display:grid;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:600px){.form-row{grid-template-columns:1fr 1fr 1fr 1fr}}
+input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:#0d1117;color:#fff;font-size:14px;outline:none}
+button.btn{padding:12px;border-radius:10px;border:0;background:#1f6feb;color:#fff;font-weight:700;cursor:pointer}
+.btn-add{background:#238636} .chart-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin:12px 0}
+.filters{display:flex;gap:8px;overflow:auto;padding-bottom:6px}
+.chip{padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:13px;white-space:nowrap;cursor:pointer}
+.chip.active{background:#fff;color:#000}
+table{width:100%;border-collapse:collapse;margin-top:8px} th{color:var(--muted);font-size:11px;text-align:left;padding:10px 6px;border-bottom:1px solid var(--border)} td{padding:12px 6px;border-bottom:1px solid #1a222e;font-size:13px}
+.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700} .badge-win{background:rgba(46,204,113,.15);color:var(--green)} .badge-loss{background:rgba(255,71,87,.15);color:var(--red)} .badge-pend{background:rgba(139,148,158,.15);color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="card">
-<h2 style="text-align:center">My Bet Tracker</h2>
-<small style="display:block;text-align:center;margin-bottom:10px">Track to stay in control. Aviator is random - no prediction works.</small>
+<h1>Bet Tracker BW</h1>
+<div class="sub">Pro Dashboard • Pula (BWP) • My Guy Edition</div>
 
-<div class="stats">
-<div class="stat"><small>Profit</small><div id="profit">P0</div></div>
-<div class="stat"><small>Bets</small><div id="count">0</div></div>
-<div class="stat"><small>Win %</small><div id="winrate">0%</div></div>
+<div class="grid" id="stats"></div>
+
+<div class="chart-box">
+<small style="color:var(--muted);font-size:11px;text-transform:uppercase">PROFIT / LOSS OVER TIME</small>
+<canvas id="plChart" height="160"></canvas>
 </div>
 
-<input id="stake" type="number" placeholder="Stake e.g 50">
-<input id="ret" type="number" placeholder="Return e.g 0 if lost, 120 if won">
-<select id="result">
-<option value="lost">Lost</option>
-<option value="won">Won</option>
-</select>
-<button onclick="addBet()">+ Add Bet</button>
-<button onclick="clearAll()" style="background:#333;color:#fff">Clear All</button>
-
-<div id="list" style="margin-top:15px"></div>
+<div class="form">
+<div class="form-row">
+<input id="date" type="date">
+<select id="sport"><option>Football</option><option>Basketball</option><option>Tennis</option><option>Cricket</option><option>Rugby</option><option>eSports</option><option>Other</option></select>
+<select id="result"><option value="win">Win</option><option value="loss">Loss</option><option value="pending">Pending</option><option value="void">Void</option></select>
+<input id="odds" type="number" step="0.01" placeholder="Odds">
+</div>
+<div class="form-row">
+<input id="stake" type="number" placeholder="Stake P">
+<input id="selection" placeholder="Selection e.g Over 2.5">
+<input id="market" placeholder="Market e.g 1X2" style="grid-column:span 2">
+</div>
+<button class="btn btn-add" onclick="addBet()">+ Add Bet</button>
 </div>
 
-<script>
-let bets = JSON.parse(localStorage.getItem('bets')||'[]');
-function render(){
- let totalProfit=0,wins=0;
- let html='';
- bets.slice().reverse().forEach(b=>{
-   totalProfit+= (b.ret - b.stake);
-   if(b.result==='won') wins++;
-   html+=`<div class="item"><span>P${b.stake} → P${b.ret} <small>${b.result}</small></span><span>${new Date(b.time).toLocaleDateString()}</span></div>`;
- });
- document.getElementById('list').innerHTML=html;
- document.getElementById('count').innerText=bets.length;
- document.getElementById('profit').innerText='P'+totalProfit;
- document.getElementById('profit').className= totalProfit>=0?'profit':'loss';
- document.getElementById('winrate').innerText= bets.length? Math.round(wins/bets.length*100)+'%' : '0%';
- localStorage.setItem('bets',JSON.stringify(bets));
-}
-function addBet(){
- let stake=parseFloat(document.getElementById('stake').value);
- let ret=parseFloat(document.getElementById('ret').value);
- let result=document.getElementById('result').value;
- if(!stake && stake!==0) return alert('Enter stake');
- bets.push({stake,ret,time:Date.now(),result});
- document.getElementById('stake').value=''; document.getElementById('ret').value='';
- render();
-}
-function clearAll(){ if(confirm('Clear all bets?')){ bets=[]; render(); } }
-render();
-</script>
-</body>
-</html>
+<div class="filters" id="filters">
+<div class="chip active" onclick="filterSport('All',this)">All</div>
+<div class="chip" onclick="filterSport('Football',this)">Football</div>
+<div class="chip" onclick="filterSport('Basketball',this)">Basketball</div>
+<div class="chip" onclick="filterSport('Tennis',this)">Tennis</div>
